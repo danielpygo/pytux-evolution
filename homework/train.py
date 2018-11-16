@@ -67,18 +67,22 @@ def train(epoch):
 
         indices = np.argsort(rewards)[:keep_models]
         survivors = [models[i] for i in indices]
-        compute_new = {}
+        compute_new_gauss= {}
+        params = {}
         sum_mean = 0
         for survivor in survivors:
             for k,v in survivor.named_parameters():
                 if k in compute_new:
-                    compute_new[k] = (0,2)
+                    compute_new_gauss[k] = (0,2)
                 else:
-                    compute_new[k][0] += v
-        for k,v in compute_new:
-            compute_new[k][0] /= 4
-
-        gaussians = compute_new
+                    compute_new_gauss[k][0] += v
+        for k,v in compute_new_gauss:
+            compute_new_gauss[k][0] /= 4
+            params[k] = compute_new_gauss[k][0]
+        m = Model()
+        m.load_state_dict(params)
+        alpha_model = m
+        gaussians = compute_new_gausss
 
         # Print diagnostics
         print ('====== Iter: %d ======' % t)
